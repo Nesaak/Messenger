@@ -28,7 +28,7 @@ public class RedisMessageAgent extends BinaryJedisPubSub implements MessageAgent
     public Jedis getJedis() {
         JedisPool jedisPool = pool.get();
         if (jedisPool == null) {
-            System.err.println("Could not send message: JedisPool no longer exists");
+            System.err.println("Could not get Jedis: JedisPool no longer exists");
             return null;
         }
         return jedisPool.getResource();
@@ -36,10 +36,12 @@ public class RedisMessageAgent extends BinaryJedisPubSub implements MessageAgent
 
     @Override
     public void send(byte[] bytes) {
-        Jedis jedis = getJedis();
-        if (jedis == null) return;
+        CompletableFuture.runAsync(() -> {
+            Jedis jedis = getJedis();
+            if (jedis == null) return;
 
-        jedis.publish(CHANNEL, bytes);
+            jedis.publish(CHANNEL, bytes);
+        });
     }
 
     @Override
