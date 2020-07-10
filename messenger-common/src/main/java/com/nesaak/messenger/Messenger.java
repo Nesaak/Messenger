@@ -1,16 +1,13 @@
 package com.nesaak.messenger;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Messenger {
 
     private MessageAgent agent;
-
-    private ProtocolManager protocolManager = new ProtocolManager();
     private MessageListener listener = bytes -> receive(bytes);
+    private List<MessageListener> listeners = new ArrayList();
 
     public Messenger(MessageAgent agent) {
         this.agent = agent;
@@ -21,24 +18,17 @@ public class Messenger {
         return agent;
     }
 
-    public ProtocolManager getProtocolManager() {
-        return protocolManager;
+    public List<MessageListener> getListeners() {
+        return listeners;
     }
 
     private void receive(byte[] bytes) {
-        try {
-            DataInputStream stream = new DataInputStream(new BufferedInputStream(new ByteArrayInputStream(bytes)));
-            int id = stream.readInt();
-        } catch (IOException e) {
-            throw new RuntimeException("Invalid Message Received:\n" + new String(bytes));
+        for (MessageListener listener : listeners) {
+            listener.receive(bytes);
         }
     }
 
     public void publish(byte[] bytes) {
         agent.send(bytes);
-    }
-
-    public void publish(Message message) {
-        publish(message.getProtocol().getBytes(message));
     }
 }
