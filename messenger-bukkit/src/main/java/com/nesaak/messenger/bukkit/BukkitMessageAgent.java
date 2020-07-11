@@ -23,8 +23,8 @@ public class BukkitMessageAgent implements MessageAgent, PluginMessageListener {
         this.plugin = new WeakReference(plugin);
         this.channel = "messenger:" + channel;
 
-        Bukkit.getMessenger().registerOutgoingPluginChannel(getPlugin(), channel);
-        Bukkit.getMessenger().registerIncomingPluginChannel(getPlugin(), channel, this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(getPlugin(), this.channel);
+        Bukkit.getMessenger().registerIncomingPluginChannel(getPlugin(), this.channel, this);
     }
 
     public Plugin getPlugin() {
