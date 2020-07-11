@@ -11,6 +11,7 @@
     <modules>
         <module>messenger-common</module>
         <module>messenger-redis</module>
+        <module>messenger-bukkit</module>
     </modules>
 
 </project>

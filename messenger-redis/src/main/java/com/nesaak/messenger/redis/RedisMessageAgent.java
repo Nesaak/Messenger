@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class RedisMessageAgent extends BinaryJedisPubSub implements MessageAgent {
 
-    private static final byte[] CHANNEL = "messages".getBytes();
+    private static final byte[] CHANNEL = "messenger".getBytes();
 
     private WeakReference<JedisPool> pool;
     private MessageListener listener;
@@ -35,6 +35,11 @@ public class RedisMessageAgent extends BinaryJedisPubSub implements MessageAgent
     }
 
     @Override
+    public void onMessage(byte[] channel, byte[] message) {
+        receive(message);
+    }
+
+    @Override
     public void send(byte[] bytes) {
         CompletableFuture.runAsync(() -> {
             Jedis jedis = getJedis();
@@ -42,11 +47,6 @@ public class RedisMessageAgent extends BinaryJedisPubSub implements MessageAgent
 
             jedis.publish(CHANNEL, bytes);
         });
-    }
-
-    @Override
-    public void onMessage(byte[] channel, byte[] message) {
-        receive(message);
     }
 
     @Override
