@@ -13,17 +13,18 @@ import java.lang.ref.WeakReference;
 
 public class BukkitMessageAgent implements MessageAgent, PluginMessageListener {
 
-    private static final String CHANNEL = "messenger";
+    private final String channel;
     private static final long MESSAGE_RETRY_INTERVAL = 400;
 
     private WeakReference<Plugin> plugin;
     private MessageListener listener;
 
-    public BukkitMessageAgent(Plugin plugin) {
+    public BukkitMessageAgent(String channel, Plugin plugin) {
         this.plugin = new WeakReference(plugin);
+        this.channel = "messenger:" + channel;
 
-        Bukkit.getMessenger().registerOutgoingPluginChannel(getPlugin(), CHANNEL);
-        Bukkit.getMessenger().registerIncomingPluginChannel(getPlugin(), CHANNEL, this);
+        Bukkit.getMessenger().registerOutgoingPluginChannel(getPlugin(), channel);
+        Bukkit.getMessenger().registerIncomingPluginChannel(getPlugin(), channel, this);
     }
 
     public Plugin getPlugin() {
@@ -36,7 +37,7 @@ public class BukkitMessageAgent implements MessageAgent, PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
-        if (channel.equals(CHANNEL)) {
+        if (channel.equals(channel)) {
             receive(bytes);
         }
     }
@@ -49,7 +50,7 @@ public class BukkitMessageAgent implements MessageAgent, PluginMessageListener {
                 Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
                 if (player == null) return;
 
-                player.sendPluginMessage(getPlugin(), CHANNEL, bytes);
+                player.sendPluginMessage(getPlugin(), channel, bytes);
                 cancel();
             }
         }.runTaskTimer(getPlugin(), 0L, MESSAGE_RETRY_INTERVAL);
