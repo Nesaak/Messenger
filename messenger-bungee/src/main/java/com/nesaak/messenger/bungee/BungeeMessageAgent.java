@@ -3,6 +3,7 @@ package com.nesaak.messenger.bungee;
 import com.nesaak.messenger.MessageAgent;
 import com.nesaak.messenger.MessageListener;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -21,6 +22,7 @@ public class BungeeMessageAgent implements MessageAgent, Listener {
         this.plugin = new WeakReference(plugin);
         this.channel = "messenger:" + channel;
 
+        plugin.getProxy().registerChannel(this.channel);
         plugin.getProxy().getPluginManager().registerListener(getPlugin(), this);
     }
 
@@ -35,7 +37,10 @@ public class BungeeMessageAgent implements MessageAgent, Listener {
     @EventHandler
     public void onMessageEvent(PluginMessageEvent event) {
         if (event.getTag().equals(channel)) {
-            receive(event.getData());
+            if (event.getReceiver() instanceof ProxiedPlayer) {
+                receive(event.getData());
+                event.setCancelled(true);
+            }
         }
     }
 
