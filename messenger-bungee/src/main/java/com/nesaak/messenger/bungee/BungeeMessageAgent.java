@@ -13,7 +13,6 @@ import java.lang.ref.WeakReference;
 public class BungeeMessageAgent implements MessageAgent, Listener {
 
     private final String channel;
-    private static final long MESSAGE_RETRY_INTERVAL = 400;
 
     private WeakReference<Plugin> plugin;
     private MessageListener listener;
@@ -43,8 +42,9 @@ public class BungeeMessageAgent implements MessageAgent, Listener {
     @Override
     public void send(byte[] bytes) {
         for (ServerInfo server : getPlugin().getProxy().getServers().values()) {
-            server.sendData(channel, bytes);
+            server.sendData(channel, bytes, true);
         }
+        receive(bytes);
     }
 
     @Override

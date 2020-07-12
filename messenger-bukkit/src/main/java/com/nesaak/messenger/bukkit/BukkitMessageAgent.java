@@ -37,7 +37,7 @@ public class BukkitMessageAgent implements MessageAgent, PluginMessageListener {
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
-        if (channel.equals(channel)) {
+        if (this.channel.equals(channel)) {
             receive(bytes);
         }
     }
@@ -54,6 +54,7 @@ public class BukkitMessageAgent implements MessageAgent, PluginMessageListener {
                 cancel();
             }
         }.runTaskTimer(getPlugin(), 0L, MESSAGE_RETRY_INTERVAL);
+        receive(bytes);
     }
 
     @Override
